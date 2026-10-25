@@ -13,3 +13,13 @@ export const entities = {
   {name:'notes',label:'Notes',type:'textarea',max:5000}
  ]}
 };
+entities.deployments={singular:'deployment',label:'Deployments',fields:[
+ {name:'application_id',label:'Application',type:'select',required:true,options:data=>[['','Choose an application'],...data.applications.map(row=>[row.id,row.name])]},
+ {name:'server_id',label:'Server',type:'select',required:true,options:data=>[['','Choose a server'],...data.servers.map(row=>[row.id,row.name])]},
+ {name:'label',label:'Environment / label',required:true,max:80,hint:'For example: production, staging or internal.'},
+ {name:'status',label:'Recorded status',type:'select',required:true,options:[['planned','planned'],['running','running'],['stopped','stopped']]},
+ {name:'installed_version',label:'Installed version',max:100,hint:'Record the exact tag or version. Required unless planned.'},
+ {name:'url',label:'Web interface URL',type:'url',max:2048,hint:'Optional HTTP(S) URL. No embedded credentials.'},
+ {name:'deployed_on',label:'Deployment date',type:'date'},
+ {name:'notes',label:'Notes',type:'textarea',max:5000}
+]};

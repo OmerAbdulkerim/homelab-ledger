@@ -4,11 +4,11 @@ import {entities} from '../models/entities.js';
 import {shell,escape} from '../../views/ui.js';
 import {authView,accountView} from '../../views/auth.js';
 import * as inventory from '../../views/inventory.js';
-import {preview} from '../../views/preview.js';
-import {deploymentPreview} from '../services/preview-service.js';
+import {getUpstream} from '../services/upstream-service.js';
+import {upstreamResult} from '../../views/upstream.js';
 const app = document.querySelector('#app');
 const searches={},filters={};
-let routeSection='overview';
+let routeSection='overview',upstreamRequest=0;
 export function notify(message) {
  const node=document.querySelector('#notice');node.textContent=message;node.hidden=false;
  clearTimeout(notify.timer);notify.timer=setTimeout(()=>{node.hidden=true;},4500);
@@ -39,12 +39,22 @@ export function render() {
   if(section==='account')content=accountView(user);
   else if(section==='users'&&user.role!=='admin')content=errorPage(403,'Only an admin can manage users. You can still read inventory and work on assigned maintenance.');
   else if(Object.hasOwn(entities,section)&&parts.length<=3&&(!action||action==='edit'))content=renderEntity(section,id,action,user);
-  else if(section==='deployments')content=preview(deploymentPreview());
   else if(section==='overview'||section==='')content=`<div class="page-content"><h1>Your homelab, in order.</h1><p class="page-intro">A shared record of what runs where, and what needs attention.</p><div class="form-actions"><a class="button primary" href="#/servers">Open servers</a><a class="button" href="#/applications">Open applications</a><a class="button" href="#/deployments/2">Open deployments</a></div><p class="inline-note">Static M1 preview. Records and demo accounts reset on refresh.</p></div>`;
   else content=errorPage(404,'This page is not part of your workspace.');
   app.innerHTML=shell(user,section,content);
  }
+ loadUpstream();
  document.title=`${section.charAt(0).toUpperCase()+section.slice(1)} · Homelab Ledger`;
+}
+async function loadUpstream(mode='sample') {
+ const section=app.querySelector('[data-upstream]');if(!section)return;
+ const request=++upstreamRequest,node=section.querySelector('[data-upstream-result]');
+ const application=ledger.snapshot().applications.find(row=>row.id===Number(section.dataset.applicationId));
+ node.setAttribute('aria-busy','true');
+ node.innerHTML='<p class="muted">Loading sample release…</p>';
+ const result=await getUpstream(application,mode);
+ if(request!==upstreamRequest||!section.isConnected)return;
+ node.innerHTML=upstreamResult(result,section.dataset.installed);node.setAttribute('aria-busy','false');
 }
 function showFormError(form,error) {const target=form.querySelector('.form-error');target.textContent=error.message;target.hidden=false;}
 function updateList() {
@@ -58,11 +68,17 @@ export function start() {
   if(event.target.matches('input[type="search"]')){searches[routeSection]=event.target.value;updateList();}
  });
  app.addEventListener('change',event=>{
+  if(event.target.name==='upstream_mode')loadUpstream(event.target.value);
   if(event.target.name==='status_filter'){filters[routeSection]=event.target.value;updateList();}
  });
  app.addEventListener('click',event=>{
   const control=event.target.closest('[data-action]');if(!control)return;
   const action=control.dataset.action;
+  if(action==='detail-tab'){
+   app.querySelectorAll('[data-detail-panel]').forEach(panel=>{panel.hidden=panel.dataset.detailPanel!==control.dataset.tab;});
+   app.querySelectorAll('[data-action="detail-tab"]').forEach(button=>button.setAttribute('aria-pressed',String(button===control)));
+  }
+  if(action==='retry-upstream'){const select=app.querySelector('[name="upstream_mode"]');select.value='sample';loadUpstream();}
   if(action==='logout'){auth.logout();location.hash='/login';notify('Logged out of the preview.');}
   if(action==='demo'){auth.enterDemo(control.dataset.role);location.hash='/overview';}
   if(action==='clear-search'){searches[routeSection]='';filters[routeSection]='';render();}

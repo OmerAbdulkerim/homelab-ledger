@@ -1,5 +1,6 @@
 import {entities} from '../js/models/entities.js';
 import {escape,icon} from './ui.js';
+import {upstreamContainer} from './upstream.js';
 export const dateLabel = value=>value?new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'short',year:'numeric',timeZone:'Europe/Sarajevo'}).format(new Date(value.length===10?`${value}T12:00:00Z`:value)):'No date';
 export function recordName(entity,row,data) {
  if(entity==='deployments')return data.applications.find(app=>app.id===row.application_id)?.name || 'Unknown application';
@@ -36,9 +37,10 @@ export function maintenanceTable(rows,data) {
 }
 export function inventoryDetail(entity,row,data,user) {
  if(!row)return `<div class="empty-state"><h2>No ${entities[entity].label.toLowerCase()} yet</h2><p>${user.role==='admin'?`Add the first ${entities[entity].singular}.`:'An admin can add inventory records.'}</p></div>`;
+ if(entity==='deployments')return deploymentDetail(row,data,user);
  let body;
  if(entity==='servers')body=fields([['Hostname',escape(row.hostname)],['Purpose',escape(row.purpose)]])+relatedDeployments(data.deployments.filter(item=>item.server_id===row.id),data)+maintenanceTable(data.maintenance.filter(item=>item.server_id===row.id || data.deployments.some(deployment=>deployment.id===item.deployment_id&&deployment.server_id===row.id)),data);
- else body=fields([['Description',escape(row.description)],['Repository',row.github_owner?`<a href="https://github.com/${encodeURIComponent(row.github_owner)}/${encodeURIComponent(row.github_repo)}" target="_blank" rel="noopener noreferrer">${escape(row.github_owner)}/${escape(row.github_repo)} ${icon('external')}</a>`:'Not linked']])+relatedDeployments(data.deployments.filter(item=>item.application_id===row.id),data);
+ else body=fields([['Description',escape(row.description)],['Repository',row.github_owner?`<a href="https://github.com/${encodeURIComponent(row.github_owner)}/${encodeURIComponent(row.github_repo)}" target="_blank" rel="noopener noreferrer">${escape(row.github_owner)}/${escape(row.github_repo)} ${icon('external')}</a>`:'Not linked']])+relatedDeployments(data.deployments.filter(item=>item.application_id===row.id),data)+upstreamContainer(row);
  return detailHeader(row.name,entity==='servers'?row.hostname:row.description,adminActions(entity,row,user))+body+notes(row.notes)+deleteAction(entity,row,user);
 }
 function formField(field,row,data,user) {
@@ -57,4 +59,12 @@ export function editForm(entity,row,data,user,isNew) {
 }
 export function deleteDialog(entity,row,data) {
  return `<dialog id="delete-dialog" aria-labelledby="delete-title"><h2 id="delete-title">Delete ${entities[entity].singular}?</h2><p>Remove <strong>${escape(recordName(entity,row,data))}</strong> from this sample workspace? Records with dependent deployments or maintenance cannot be removed.</p><p class="form-error" role="alert" hidden></p><div class="form-actions"><button class="button" data-action="cancel-delete" autofocus>Keep record</button><button class="button danger" data-action="confirm-delete" data-entity="${entity}" data-id="${row.id}">Delete ${entities[entity].singular}</button></div></dialog>`;
+}
+
+export function deploymentDetail(row,data,user) {
+ const application=data.applications.find(item=>item.id===row.application_id),server=data.servers.find(item=>item.id===row.server_id);
+ const tasks=data.maintenance.filter(item=>item.deployment_id===row.id);
+ const external=row.url?`<a class="button primary" href="${escape(row.url)}" target="_blank" rel="noopener noreferrer">${icon('external')} Open interface</a>`:'';
+ const metadata=fields([['Server',`<a href="#/servers/${row.server_id}">${escape(server.name)}</a>`],['Version',escape(row.installed_version)||'Not recorded'],['Status',`Recorded: ${escape(row.status)}`],['Interface',row.url?`<a href="${escape(row.url)}" target="_blank" rel="noopener noreferrer">${escape(new URL(row.url).host)}</a>`:'Not recorded']]);
+ return detailHeader(application.name,`${row.label} on ${server.name}`,external+adminActions('deployments',row,user))+`<div class="detail-tabs" aria-label="Deployment detail view"><button data-action="detail-tab" data-tab="record" aria-pressed="true">Record</button><button data-action="detail-tab" data-tab="maintenance" aria-pressed="false">Maintenance</button></div><div data-detail-panel="record">${metadata}${upstreamContainer(application,row.installed_version)}${maintenanceTable(tasks,data)}${notes(row.notes)}<p class="inline-note">Deployment date: ${row.deployed_on?dateLabel(row.deployed_on):'Not recorded'}. Status is maintained manually.</p></div><div data-detail-panel="maintenance" hidden>${maintenanceTable(tasks,data)}<a class="button" href="#/maintenance/new">${icon('plus')} Add maintenance</a></div>${deleteAction('deployments',row,user)}`;
 }
