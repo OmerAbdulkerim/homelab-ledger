@@ -1,0 +1,10 @@
+<template id="delete-dialog-view">
+  <dialog id="delete-dialog" aria-labelledby="delete-title">
+    <h2 id="delete-title"></h2><p>Remove <strong data-record-name></strong> from this sample workspace? <span data-deletion-rule></span></p>
+    <p class="form-error" role="alert" hidden></p>
+    <div class="form-actions">
+      <button class="button" data-action="cancel-delete" autofocus>Keep record</button>
+      <button class="button danger" data-action="confirm-delete"></button>
+    </div>
+  </dialog>
+</template>

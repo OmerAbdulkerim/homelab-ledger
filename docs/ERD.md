@@ -58,7 +58,8 @@ erDiagram
 - Exactly one task target is required: server_id XOR deployment_id. The ERD's
   optional target edges express each column's nullability, not a targetless task.
 - Each deployment has one application and server. Multiple instances on the same
-  server are allowed; a label identifies the instance.
+  server are allowed; a label identifies the instance. The planned unique key is
+  (application_id, server_id, label), reflected in M1 service validation.
 - Emails are unique. Roles: admin, user. Deployment statuses are manually recorded
   running, stopped, or planned, never measured health. Task states: open,
   in_progress, completed. Completed tasks include completion time and outcome.

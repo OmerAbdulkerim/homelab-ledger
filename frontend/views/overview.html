@@ -1,0 +1,19 @@
+<template id="overview-view">
+  <div class="page-content overview-page">
+    <div class="overview-heading"><div><h1>Overview</h1><p class="page-intro"></p></div><a class="button primary" href="#/maintenance/new"><span data-icon="plus"></span> Add maintenance</a></div>
+    <div class="overview-columns">
+      <section data-maintenance><div class="section-heading"><h2>Pending maintenance</h2><a href="#/maintenance">View all <span data-icon="arrow"></span></a></div></section>
+      <section class="server-index"><div class="section-heading"><h2>Server index</h2><a href="#/servers">View all <span data-icon="arrow"></span></a></div></section>
+    </div>
+    <section class="overview-footer"><p data-permissions></p><p>Static M1 preview. Changes reset on refresh. Recorded statuses and release examples are not live information.</p></section>
+  </div>
+</template>
+<template id="work-list"><ul class="work-list"></ul></template>
+<template id="work-item"><li><div><a class="task-title"></a><span class="task-context"></span></div><span class="task-due"></span></li></template>
+<template id="server-summary">
+  <div class="server-summary"><a><span data-icon="servers"></span> <strong></strong><span data-hostname></span></a><p></p><ul></ul></div>
+</template>
+<template id="server-deployment"><li><a><span data-name></span> <span class="deployment-label"></span></a><span data-version></span></li></template>
+<template id="no-pending"><div class="empty-state"><h3>No pending maintenance</h3><p>No open or in-progress tasks.</p></div></template>
+<template id="no-servers"><p class="muted">No servers recorded. An admin can add the first one.</p></template>
+<template id="no-deployments"><li>No deployments recorded.</li></template>

@@ -27,7 +27,9 @@ export function register(input) {
 }
 export function logout() { store.sessionUserId = null; }
 export function enterDemo(role) {
- return login({email:role === 'admin'?'admin@homelab.example':'user@homelab.example',password:role === 'admin'?'ledger-admin':'ledger-user'});
+ const user=store.data.users.find(row=>row.role===role && demoPasswords.has(row.id));
+ if(!user)throw new Error('No account with that role remains in this preview. Refresh to restore the demo accounts.');
+ return login({email:user.email,password:demoPasswords.get(user.id)});
 }
 export function updateAccount(input) {
  const user = currentUser();

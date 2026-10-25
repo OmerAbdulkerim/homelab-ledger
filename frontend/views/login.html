@@ -1,0 +1,13 @@
+<template id="login-view">
+  <section class="auth-form-panel">
+    <h2>Log in</h2>
+    <p class="form-intro">Use a demo account or sign in below.</p>
+    <form data-form="login" class="ledger-form">
+      <label>Email<input name="email" type="email" autocomplete="username" maxlength="254" required></label>
+      <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="form-error" role="alert" hidden></p>
+      <button class="button primary" type="submit">Log in <span data-icon="arrow"></span></button>
+    </form>
+    <p class="auth-switch"><a href="#/register">Create an account</a></p>
+  </section>
+</template>

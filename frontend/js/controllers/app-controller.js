@@ -1,20 +1,23 @@
 import * as auth from '../services/auth-service.js';
 import * as ledger from '../services/ledger-service.js';
 import {entities} from '../models/entities.js';
-import {shell,escape} from '../../views/ui.js';
-import {authView,accountView} from '../../views/auth.js';
-import * as inventory from '../../views/inventory.js';
+import {shell, errorPage, element} from '../views/ui.js';
+import {authView,accountView} from '../views/auth.js';
+import * as inventory from '../views/inventory.js';
 import {getUpstream} from '../services/upstream-service.js';
-import {upstreamResult} from '../../views/upstream.js';
-import {overviewView} from '../../views/overview.js';
+import {upstreamResult} from '../views/upstream.js';
+import {overviewView} from '../views/overview.js';
 const app = document.querySelector('#app');
+ document.querySelector('.skip-link').addEventListener('click',event=>{
+  event.preventDefault();document.querySelector('#main')?.focus();
+ });
 const searches={},filters={};
 let routeSection='overview',upstreamRequest=0,dirty=false,renderedHash=location.hash;
 export function notify(message) {
  const node=document.querySelector('#notice');node.textContent=message;node.hidden=false;
  clearTimeout(notify.timer);notify.timer=setTimeout(()=>{node.hidden=true;},4500);
 }
-export function errorPage(code,message) { return `<section class="error-page"><h1>${code === 403?'Access restricted':'Page not found'}</h1><p>${escape(message)}</p><a class="button" href="#/overview">Back to overview</a></section>`; }
+
 function filteredRows(entity,data) {
  const needle=(searches[entity]||'').trim().toLowerCase();
  return data[entity].filter(row=>(!filters[entity]||row.status===filters[entity])&&`${inventory.recordName(entity,row,data)} ${inventory.recordSubtitle(entity,row,data)} ${row.hostname||''} ${row.installed_version||''}`.toLowerCase().includes(needle));
@@ -34,7 +37,7 @@ export function render() {
  const user=auth.currentUser();
  if (['login','register'].includes(section)) {
   if(user){location.hash='/overview';return;}
-  app.innerHTML=authView(section);
+  app.replaceChildren(authView(section));
  } else if(!user) { location.hash='/login';return; }
  else {
   let content;
@@ -43,7 +46,7 @@ export function render() {
   else if(Object.hasOwn(entities,section)&&parts.length<=3&&(!action||action==='edit'))content=renderEntity(section,id,action,user);
   else if(section==='overview'||section==='')content=overviewView(ledger.snapshot(),user);
   else content=errorPage(404,'This page is not part of your workspace.');
-  app.innerHTML=shell(user,section,content);
+  app.replaceChildren(shell(user,section,content));
  }
  loadUpstream();
  document.title=`${section.charAt(0).toUpperCase()+section.slice(1)} · Homelab Ledger`;
@@ -53,16 +56,16 @@ async function loadUpstream(mode='sample') {
  const request=++upstreamRequest,node=section.querySelector('[data-upstream-result]');
  const application=ledger.snapshot().applications.find(row=>row.id===Number(section.dataset.applicationId));
  node.setAttribute('aria-busy','true');
- node.innerHTML='<p class="muted">Loading sample release…</p>';
+ node.replaceChildren(element('loading-text'));
  const result=await getUpstream(application,mode);
  if(request!==upstreamRequest||!section.isConnected)return;
- node.innerHTML=upstreamResult(result,section.dataset.installed);node.setAttribute('aria-busy','false');
+ node.replaceChildren(upstreamResult(result,section.dataset.installed));node.setAttribute('aria-busy','false');
 }
-function showFormError(form,error) {const target=form.querySelector('.form-error');target.textContent=error.message;target.hidden=false;}
+function showFormError(form,error) {document.querySelector('#notice').hidden=true;const target=form.querySelector('.form-error');target.textContent=error.message;target.hidden=false;}
 function updateList() {
  if(!Object.hasOwn(entities,routeSection))return;
  const data=ledger.snapshot(),id=Number(location.hash.split('/')[2])||data[routeSection][0]?.id;
- app.querySelector('.record-list').innerHTML=inventory.recordList(routeSection,filteredRows(routeSection,data),id,data);
+ app.querySelector('.record-list').replaceChildren(inventory.recordList(routeSection,filteredRows(routeSection,data),id,data));
 }
 export function start() {
  window.addEventListener('hashchange',()=>{
@@ -80,6 +83,7 @@ export function start() {
   if(event.target.name==='status_filter'){filters[routeSection]=event.target.value;updateList();}
  });
  app.addEventListener('click',event=>{
+  document.querySelector('#notice').hidden=true;
   const control=event.target.closest('[data-action]');if(!control)return;
   const action=control.dataset.action;
   if(action==='detail-tab'){
@@ -87,12 +91,12 @@ export function start() {
    app.querySelectorAll('[data-action="detail-tab"]').forEach(button=>button.setAttribute('aria-pressed',String(button===control)));
   }
   if(action==='retry-upstream'){const select=app.querySelector('[name="upstream_mode"]');select.value='sample';loadUpstream();}
-  if(action==='logout'){auth.logout();location.hash='/login';notify('Logged out of the preview.');}
-  if(action==='demo'){auth.enterDemo(control.dataset.role);location.hash='/overview';}
-  if(action==='clear-search'){searches[routeSection]='';filters[routeSection]='';render();}
+  if(action==='logout'){if(dirty&&!window.confirm('Discard your unsaved changes and log out?'))return;dirty=false;auth.logout();location.hash='/login';notify('Logged out of the preview.');}
+  if(action==='demo'){try{auth.enterDemo(control.dataset.role);location.hash='/overview';}catch(error){showFormError(app.querySelector('form'),error);}}
+  if(action==='clear-search'){searches[routeSection]='';filters[routeSection]='';app.querySelector('input[type=search]').value='';const select=app.querySelector('[name=status_filter]');if(select)select.value='';updateList();}
   if(action==='delete'){
    const entity=control.dataset.entity,row=ledger.get(entity,control.dataset.id);
-   app.querySelector('#delete-dialog')?.remove();app.insertAdjacentHTML('beforeend',inventory.deleteDialog(entity,row,ledger.snapshot()));
+   app.querySelector('#delete-dialog')?.remove();app.append(inventory.deleteDialog(entity,row,ledger.snapshot()));
    document.querySelector('#delete-dialog').showModal();
   }
   if(action==='cancel-delete')document.querySelector('#delete-dialog').close();

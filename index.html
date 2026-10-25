@@ -12,7 +12,14 @@
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <div id="app"></div>
+  <div id="app" aria-busy="true">
+    <main id="main" class="page-content" data-startup-state tabindex="-1">
+      <h1>Homelab Ledger</h1>
+      <p data-loading>Loading your workspace…</p>
+      <p class="form-error" role="alert" hidden>The view templates could not be loaded. Check that the local server is running, then retry.</p>
+      <button id="retry-templates" class="button" type="button" hidden>Retry loading views</button>
+    </main>
+  </div>
   <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
   <noscript>This single-page application needs JavaScript enabled.</noscript>
 </body>

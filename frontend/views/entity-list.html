@@ -1,0 +1,33 @@
+<template id="workspace-view">
+  <div class="workspace">
+    <aside class="record-index">
+      <div class="index-title"><h1></h1><a class="button primary" data-add><span data-icon="plus"></span><span data-label></span></a></div>
+      <label class="search-field"><span data-icon="search"></span><input type="search"></label>
+      <div class="record-list"></div>
+      <label class="index-filter"><span>Filter by status</span><select name="status_filter" aria-label="Filter by status"><option value="">All statuses</option></select></label>
+      <p class="index-footnote">Sample data · Changes reset on refresh</p>
+    </aside>
+    <article class="record-detail">
+      <a class="back-to-list"><span data-icon="back"></span><span data-label></span></a>
+    </article>
+  </div>
+</template>
+
+<template id="record-row">
+  <a class="record-row">
+    <span class="app-symbol"></span>
+    <span class="record-name"><strong></strong><span></span></span>
+    <span data-icon="arrow"></span>
+  </a>
+</template>
+
+<template id="empty-search">
+  <div class="empty-state">
+    <h3>No matching records</h3><p>Try a different search, or clear the filters.</p>
+    <button class="button" data-action="clear-search">Clear filters</button>
+  </div>
+</template>
+
+<template id="empty-inventory">
+  <div class="empty-state"><h2></h2><p></p></div>
+</template>

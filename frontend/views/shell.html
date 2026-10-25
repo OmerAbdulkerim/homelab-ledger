@@ -1,0 +1,60 @@
+<template id="shell-view">
+  <header class="app-header">
+    <a class="brand" href="#/overview">Homelab Ledger</a>
+    <span class="sample-label">Sample workspace · M1 preview</span>
+    <div class="account-actions">
+      <a href="#/account"><span data-user-name></span> <span class="muted" data-user-role></span></a>
+      <button class="icon-button" data-action="logout" aria-label="Log out"><span data-icon="logout"></span></button>
+    </div>
+  </header>
+  <nav class="section-nav" aria-label="Main navigation"></nav>
+  <main id="main" tabindex="-1"></main>
+</template>
+
+<template id="nav-item">
+  <a><span data-icon></span><span data-label></span></a>
+</template>
+
+<template id="auth-shell">
+  <main id="main" class="auth-page" tabindex="-1">
+    <a class="brand" href="#/login">Homelab Ledger</a>
+    <div class="auth-layout">
+      <section class="auth-intro">
+        <h1>Homelab<br>inventory</h1>
+        <p>Track servers, installed applications, and maintenance tasks.</p>
+        <dl class="auth-index">
+          <div><dt>Inventory</dt><dd>Servers and applications.</dd></div>
+          <div><dt>Deployments</dt><dd>Installed versions and URLs.</dd></div>
+          <div><dt>Maintenance</dt><dd>Tasks, assignees, and outcomes.</dd></div>
+        </dl>
+        <p class="preview-explanation">Milestone 1 · Static preview<br>Sample data. Changes and new accounts reset on refresh.<br>Demo authentication only; use a made-up password.</p>
+      </section>
+    </div>
+  </main>
+</template>
+
+<template id="demo-access">
+  <div class="demo-access">
+    <h3>Try a demo account</h3>
+    <div class="demo-buttons">
+      <button class="button" data-action="demo" data-role="admin">Explore as admin</button>
+      <button class="button" data-action="demo" data-role="user">Explore as user</button>
+    </div>
+    <p>Admin: admin@homelab.example / ledger-admin<br>User: user@homelab.example / ledger-user</p>
+  </div>
+</template>
+
+<template id="action-link">
+  <a class="button"><span data-icon></span><span data-label></span></a>
+</template>
+
+<template id="error-page">
+  <section class="error-page">
+    <h1></h1><p></p><a class="button" href="#/overview">Back to overview</a>
+  </section>
+</template>
+
+<template id="text-note"><p class="inline-note"></p></template>
+<template id="paragraph"><p></p></template>
+<template id="loading-text"><p class="muted">Loading sample release…</p></template>
+<template id="status-badge"><span class="status-badge"></span></template>
