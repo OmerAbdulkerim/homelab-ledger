@@ -6,9 +6,10 @@ import {authView,accountView} from '../../views/auth.js';
 import * as inventory from '../../views/inventory.js';
 import {getUpstream} from '../services/upstream-service.js';
 import {upstreamResult} from '../../views/upstream.js';
+import {overviewView} from '../../views/overview.js';
 const app = document.querySelector('#app');
 const searches={},filters={};
-let routeSection='overview',upstreamRequest=0;
+let routeSection='overview',upstreamRequest=0,dirty=false,renderedHash=location.hash;
 export function notify(message) {
  const node=document.querySelector('#notice');node.textContent=message;node.hidden=false;
  clearTimeout(notify.timer);notify.timer=setTimeout(()=>{node.hidden=true;},4500);
@@ -27,6 +28,7 @@ function renderEntity(entity,id,action,user) {
  return inventory.workspace(entity,filteredRows(entity,data),row,data,user,detail,{search:searches[entity],filter:filters[entity],hasSelection:Boolean(id),editing});
 }
 export function render() {
+ dirty=false;renderedHash=location.hash;
  const parts=location.hash.replace(/^#\/?/,'').split('/');
  const [section='overview',id,action]=parts;routeSection=section;
  const user=auth.currentUser();
@@ -39,7 +41,7 @@ export function render() {
   if(section==='account')content=accountView(user);
   else if(section==='users'&&user.role!=='admin')content=errorPage(403,'Only an admin can manage users. You can still read inventory and work on assigned maintenance.');
   else if(Object.hasOwn(entities,section)&&parts.length<=3&&(!action||action==='edit'))content=renderEntity(section,id,action,user);
-  else if(section==='overview'||section==='')content=`<div class="page-content"><h1>Your homelab, in order.</h1><p class="page-intro">A shared record of what runs where, and what needs attention.</p><div class="form-actions"><a class="button primary" href="#/servers">Open servers</a><a class="button" href="#/applications">Open applications</a><a class="button" href="#/deployments/2">Open deployments</a></div><p class="inline-note">Static M1 preview. Records and demo accounts reset on refresh.</p></div>`;
+  else if(section==='overview'||section==='')content=overviewView(ledger.snapshot(),user);
   else content=errorPage(404,'This page is not part of your workspace.');
   app.innerHTML=shell(user,section,content);
  }
@@ -63,11 +65,17 @@ function updateList() {
  app.querySelector('.record-list').innerHTML=inventory.recordList(routeSection,filteredRows(routeSection,data),id,data);
 }
 export function start() {
- window.addEventListener('hashchange',()=>{render();document.querySelector('#main')?.focus({preventScroll:true});});
+ window.addEventListener('hashchange',()=>{
+  if(dirty&&!window.confirm('Discard your unsaved changes?')){history.replaceState(null,'',renderedHash);return;}
+  render();document.querySelector('#main')?.focus({preventScroll:true});
+ });
+ window.addEventListener('beforeunload',event=>{if(dirty){event.preventDefault();event.returnValue='';}});
  app.addEventListener('input',event=>{
+  if(event.target.closest('[data-form="record"],[data-form="account"]'))dirty=true;
   if(event.target.matches('input[type="search"]')){searches[routeSection]=event.target.value;updateList();}
  });
  app.addEventListener('change',event=>{
+  if(event.target.closest('[data-form="record"],[data-form="account"]'))dirty=true;
   if(event.target.name==='upstream_mode')loadUpstream(event.target.value);
   if(event.target.name==='status_filter'){filters[routeSection]=event.target.value;updateList();}
  });
@@ -89,7 +97,7 @@ export function start() {
   }
   if(action==='cancel-delete')document.querySelector('#delete-dialog').close();
   if(action==='confirm-delete'){
-   try{ledger.remove(control.dataset.entity,control.dataset.id);document.querySelector('#delete-dialog').close();location.hash=`/${control.dataset.entity}`;notify('Record removed from the preview.');}
+   try{ledger.remove(control.dataset.entity,control.dataset.id);document.querySelector('#delete-dialog').close();const next=`#/${control.dataset.entity}`;if(location.hash===next)render();else location.hash=next;notify('Record removed from the preview.');}
    catch(error){showFormError(document.querySelector('#delete-dialog'),error);}
   }
  });
@@ -101,7 +109,7 @@ export function start() {
    if(form.dataset.form==='register')auth.register(input);
    if(form.dataset.form==='record'){
     const row=ledger.save(form.dataset.entity,input,form.dataset.id?Number(form.dataset.id):null);
-    location.hash=`/${form.dataset.entity}/${row.id}`;notify('Record saved for this preview.');return;
+    dirty=false;location.hash=`/${form.dataset.entity}/${row.id}`;notify('Record saved for this preview.');return;
    }
    if(form.dataset.form==='account'){auth.updateAccount(input);render();notify('Profile saved for this preview.');return;}
    location.hash='/overview';
