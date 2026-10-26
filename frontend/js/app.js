@@ -1,5 +1,5 @@
-import {loadTemplates} from './services/template-service.js';
-import {start} from './controllers/app-controller.js';
+import { loadTemplates } from './services/template-service.js';
+import { start } from './controllers/app-controller.js';
 
 const app = document.querySelector('#app');
 const startup = document.querySelector('[data-startup-state]');
