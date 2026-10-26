@@ -1,0 +1,12 @@
+{
+  "name": "homelab-ledger",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write \"frontend/**/*.{css,js}\" \"tests/*.mjs\"",
+    "format:check": "prettier --check \"frontend/**/*.{css,js}\" \"tests/*.mjs\""
+  },
+  "devDependencies": {
+    "prettier": "3.9.10"
+  }
+}

@@ -1,0 +1,20 @@
+<template id="entity-form">
+  <form class="ledger-form entity-form" data-form="record">
+    <template data-fields></template>
+    <p class="form-error full-width" role="alert" hidden></p>
+    <div class="form-actions full-width">
+      <button class="button primary" type="submit"></button><a class="button" data-cancel>Cancel</a>
+    </div>
+    <p class="inline-note full-width">M1 sample data. This change lasts until you refresh the page.</p>
+  </form>
+</template>
+
+<template id="field-text">
+  <label><span data-label></span><span class="field-hint" hidden></span><input></label>
+</template>
+<template id="field-select">
+  <label><span data-label></span><span class="field-hint" hidden></span><select></select></label>
+</template>
+<template id="field-textarea">
+  <label class="full-width"><span data-label></span><span class="field-hint" hidden></span><textarea></textarea></label>
+</template>

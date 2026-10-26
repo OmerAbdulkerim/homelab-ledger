@@ -1,13 +1,26 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello World</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Homelab Ledger — a personal inventory of servers, applications, deployments and maintenance.">
+  <meta name="theme-color" content="#f8f9f6">
+  <title>Homelab Ledger</title>
+  <link rel="icon" href="frontend/assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="frontend/css/app.css">
+  <script type="module" src="frontend/js/app.js"></script>
 </head>
 <body>
-  <h1>Hello, everyone!</h1>
-  <p>Welcome to Web Programming!</p>
-  <p>New branch</p>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="app" aria-busy="true">
+    <main id="main" class="page-content" data-startup-state tabindex="-1">
+      <h1>Homelab Ledger</h1>
+      <p data-loading>Loading your workspace…</p>
+      <p class="form-error" role="alert" hidden>The view templates could not be loaded. Check that the local server is running, then retry.</p>
+      <button id="retry-templates" class="button" type="button" hidden>Retry loading views</button>
+    </main>
+  </div>
+  <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+  <noscript>This single-page application needs JavaScript enabled.</noscript>
 </body>
 </html>

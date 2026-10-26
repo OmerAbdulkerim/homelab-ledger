@@ -1,0 +1,51 @@
+<template id="detail-header">
+  <div class="record-heading"><div><h2></h2><p class="subtitle"></p></div><div class="heading-actions"></div></div>
+</template>
+<template id="record-fields"><dl class="record-fields"></dl></template>
+<template id="record-field"><div><dt></dt><dd></dd></div></template>
+<template id="notes-section"><section class="detail-section notes-section"><h3>Notes</h3><p class="preserve-lines"></p></section></template>
+<template id="table-section">
+  <section class="detail-section"><h3></h3><div class="table-scroll"><table><thead><tr></tr></thead><tbody></tbody></table></div></section>
+</template>
+<template id="delete-action"><div class="record-footer"><button class="text-button danger-text" data-action="delete"></button></div></template>
+<template id="completed-label"><span class="completed-label">Completed</span></template>
+
+<template id="deployment-detail">
+  <div class="detail-tabs" aria-label="Deployment detail view">
+    <button data-action="detail-tab" data-tab="record" aria-pressed="true">Record</button>
+    <button data-action="detail-tab" data-tab="maintenance" aria-pressed="false">Maintenance</button>
+  </div>
+  <div data-detail-panel="record"></div>
+  <div data-detail-panel="maintenance" hidden>
+    <a class="button" href="#/maintenance/new"><span data-icon="plus"></span> Add maintenance</a>
+  </div>
+</template>
+
+<template id="task-detail">
+  <section class="detail-section"><h3>Description</h3><p class="preserve-lines" data-description></p></section>
+  <section class="detail-section"><h3>Outcome</h3><p class="preserve-lines" data-outcome></p><p class="inline-note" data-completed hidden></p></section>
+  <p class="inline-note" data-read-only hidden>An admin or the assigned user can edit this task. Ask an admin to assign it to you.</p>
+</template>
+<template id="user-note"><p class="inline-note">Demo accounts are held in memory. No real access or infrastructure credentials are stored.</p></template>
+
+<template id="upstream-section">
+  <section class="detail-section upstream-section" data-upstream>
+    <h3>Upstream reference</h3>
+    <div data-upstream-result aria-live="polite" aria-busy="true"><p class="muted">Loading sample release…</p></div>
+    <label class="preview-state">Preview state<select name="upstream_mode" aria-label="Upstream preview state">
+      <option value="sample">Sample release</option><option value="no-release">No published release</option><option value="failure">GitHub unavailable</option>
+    </select></label>
+  </section>
+</template>
+<template id="upstream-unlinked"><p class="muted">No GitHub repository linked. An admin can add one to the application record.</p></template>
+<template id="upstream-versions">
+  <div class="version-comparison">
+    <div data-installed><span>Installed</span><strong></strong></div>
+    <div data-latest><span>Latest release (sample)</span><strong></strong></div>
+  </div>
+  <a class="release-link" target="_blank" rel="noopener noreferrer"><span data-icon="external"></span><span data-label>Read release notes</span></a>
+  <p class="api-caption" hidden>Sample response. Inventory remains available.</p>
+</template>
+<template id="upstream-failure">
+  <div class="upstream-failure"><p data-message></p><p class="muted" data-installed></p><button class="text-button" data-action="retry-upstream">Show sample release</button></div>
+</template>

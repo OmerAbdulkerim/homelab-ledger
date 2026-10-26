@@ -1,0 +1,14 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+/vendor/
+/backend/vendor/
+/node_modules/
+/backend/config/local.php
+/backend/logs/*
+!/backend/logs/.gitkeep
+/coverage/
+/test-results/
+/.impeccable/
+/docs/design/
