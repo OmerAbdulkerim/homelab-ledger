@@ -49,3 +49,36 @@ These issues were identified and corrected during code review and browser testin
    each deployment row and keeps labels in related tables and overview links.
    Service checks cover the two instances, and a browser search for staging
    returned only the staging deployment.
+
+## Milestone 2 — 27 October 2026
+
+### Tools used
+- I used Codex to plan the details of the MySQL schema/export, base DAO and inspiration
+   for the entity DAO's, as well as for documentation 
+- The Ponytail skill guided a plain PHP/PDO implementation without additional
+  runtime dependencies or an ORM.
+
+### Important prompts and decisions
+- “fix the whitespace checks across all required fields, check regression tests
+  and test everything locally again” — corrected the SQL checks
+  after review reproduced the whitespace-only outcome bug.
+- "what are some proposed entities that would suit my application?" 
+
+### Actual mistakes and corrections
+
+1. **The first DAO checks assumed only one pair of foreign-key error codes.**
+   The local suite failed because it expected MySQL 1452 but the restricted test
+   account received 1216. MySQL also uses 1217 instead of 1451 for restricted
+   accounts. The assertions now recognize both documented variants for each
+   failure. No privileges were broadened to make the tests pass. The suite then
+   passed against the account limited to SELECT/INSERT/UPDATE/DELETE. The
+   [MySQL error reference](https://dev.mysql.com/doc/mysql-errors/8.0/en/server-error-reference.html)
+   describes both pairs; [MySQL's explanation](https://bugs.mysql.com/bug.php?id=99336)
+   covers the privilege-dependent behavior.
+
+2. **The SQL nonblank checks only removed ordinary spaces.** Review reproduced
+   completed tasks whose outcomes were only tabs or line breaks. TRIM() did not
+   remove those characters, and the initial checks only tested spaces. New DAO
+   regressions first failed on a tab-only user name against the old schema. The
+   SQL now uses REGEXP_LIKE to require a character outside ICU Unicode whitespace
+   and U+FEFF.

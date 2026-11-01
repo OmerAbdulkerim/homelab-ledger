@@ -9,10 +9,14 @@ in the future. The app will never deploy applications automatically.
 ## Stack and architecture
 The frontend uses HTML, CSS and JavaScript as a SPA. The backend will use PHP
 with FlightPHP, MySQL and PDO. Routes receive requests, services handle the
-rules, and DAOs query the database. M1 uses sample data for now.
+rules, and DAOs query the database. The frontend still uses M1 sample data;
+M2 adds independently tested MySQL persistence.
 
 - Only backend services call DAOs. Use PDO prepared statements for queries.
 - Each of the five entities gets a service and DAO; share a reusable base DAO.
+- M2 DAOs accept a PDO connection from backend/config/Database.php. Table and
+  writable column names are fixed in each DAO; bind all values. CLI tests may
+  call DAOs directly; production callers must be services when M3 arrives.
 - Frontend views render content, controllers coordinate actions, and only service
   modules communicate with the backend. Navigation must not reload the full page.
 - Document every endpoint with OpenAPI and provide Swagger UI when routes arrive
@@ -49,7 +53,17 @@ Work only on the current milestone. Enforce authentication and permissions in
 the backend, and register new accounts as regular users. Keep secrets and logs
 out of Git and don’t expose internal errors.
 
-- Current milestone: M1, static SPA with sample data and database planning.
+- Current milestone: M2, MySQL schema, sample SQL export and five CRUD DAOs.
+- Use MySQL 8.0.16+ with enforced CHECK constraints, InnoDB and utf8mb4. Import
+  database/homelab-ledger.sql into an empty database. Store completion times in UTC.
+- Required text must contain something other than Unicode whitespace or U+FEFF.
+  Keep these SQL checks on conditionally required fields too; preserve valid text.
+- Server OS/CPU text and positive core/RAM/storage specifications are optional;
+  use NULL for unknown values, whole MiB for RAM and GiB for storage. They are
+  recorded inventory, not live measurements. Server/deployment created_at and
+  updated_at are UTC database-managed fields and are read-only through DAOs.
+- Keep the frontend on sample data until M4. Routes, services and external API
+  calls start in M3; do not add them to M2.
 - M2 adds MySQL/DAOs; M3 services/routes/GitHub/OpenAPI;
   M4 JWT/roles/middleware/logging/full integration; M5 final validation/deployment.
 - Missing, invalid or expired JWT: 401. Insufficient permissions: 403.
@@ -71,12 +85,16 @@ complete, and report any failures honestly.
 
 - Local server: `php -S 127.0.0.1:8080 -t .`.
 - Service checks: `node tests/services.mjs` (no external dependencies).
+- DAO integration checks: `php tests/dao.php`, using the configured, separately
+  imported test_database ending in _test. Never point tests at real inventory.
+  Tests roll back row changes; MySQL AUTO_INCREMENT counters may advance.
 - Template checks: open `/tests/templates.html` through the local server.
-- PHP syntax: `php -l backend/config/config.example.php`.
+- PHP syntax: `php -l` for every backend and test PHP file.
 - JavaScript syntax: `node --check` for changed JavaScript modules.
 - Whitespace: `git diff --check`.
-- M1 data and passwords live in memory and reset on reload; mock authentication
-  is not backend security.
+- Frontend data and passwords live in memory and reset on reload. M2 MySQL rows
+  persist separately; mock authentication is not backend security. DAOs do not
+  authorize actions; password hashing and response redaction belong to services.
 
 ## Design and lookup rules
 Keep the existing layout and adapt it for small screens. Make deployment labels
@@ -90,4 +108,4 @@ and show installed and upstream versions without guessing updates.
 - Include deployment labels in the index, related tables and overview to
   distinguish instances of the same application on the same server.
 - Future hosting must keep config, logs and Git files private. The root PHP
-  static server is for local M1 use only.
+  static server is for local coursework use only.
