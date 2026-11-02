@@ -26,6 +26,10 @@ a deployment, updating its details or completing a maintenance task.
 - Five entities: users, servers, applications, deployments and maintenance tasks.
 - Each deployment links one app to one server; labels distinguish multiple instances.
 - Tasks target one server or deployment and may have an assignee.
+- MySQL server records include optional OS/version, CPU model/core count, RAM
+  (MiB) and storage (GiB). These are manually recorded specifications, not measured
+  utilization. Servers and deployments have database-managed creation/update times.
+  These M2 fields reach the frontend during M4 integration.
 - GitHub release information will appear beside installed versions. Different
   version strings alone do not establish whether an update is needed.
 - Admins manage all records; regular users read inventory, create tasks, edit
