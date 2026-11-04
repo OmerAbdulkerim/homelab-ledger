@@ -48,6 +48,17 @@ $app->map('error', function (Throwable $error) use ($app): void {
     $app->response()->send();
 });
 
+foreach ([
+    '/docs' => ['text/html; charset=utf-8', $root . '/docs/swagger.html'],
+    '/openapi.json' => ['application/json', $root . '/docs/openapi.json'],
+    '/swagger-ui.css' => ['text/css', $root . '/node_modules/swagger-ui-dist/swagger-ui.css'],
+    '/swagger-ui-bundle.js' => ['text/javascript', $root . '/node_modules/swagger-ui-dist/swagger-ui-bundle.js'],
+] as $url => [$type, $file]) {
+    $app->route('GET ' . $url, function () use ($app, $type, $file): void {
+        $app->response()->header('Content-Type', $type)->write(file_get_contents($file));
+    });
+}
+
 $resources = [
     '/api/servers' => ServerService::class,
     '/api/applications' => ApplicationService::class,
