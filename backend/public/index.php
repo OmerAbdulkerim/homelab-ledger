@@ -27,6 +27,29 @@ $app = new Engine();
 $app->set('flight.allow_method_override', false);
 $app->response()->header('Cache-Control', 'no-store')->header('X-Content-Type-Options', 'nosniff');
 
+$testRun = getenv('HOMELAB_API_TEST_RUN', true);
+$requestedTestRun = $_SERVER['HTTP_X_HOMELAB_TEST_RUN'] ?? null;
+$testConnection = null;
+if ($testRun !== false || $requestedTestRun !== null) {
+    $runPattern = '/\A[a-f0-9]{32}\z/';
+    if ($testRun === false || !preg_match($runPattern, $testRun)
+        || $requestedTestRun === null || !preg_match($runPattern, $requestedTestRun)
+        || !hash_equals($testRun, $requestedTestRun)) {
+        $app->json(['error' => 'API test run not authorized.'], 403);
+        $app->response()->send();
+        exit;
+    }
+
+    try {
+        $testConnection = Database::connectForApiTests();
+    } catch (Throwable) {
+        $app->json(['error' => 'API test database unavailable.'], 503);
+        $app->response()->send();
+        exit;
+    }
+    $app->response()->header('X-Homelab-Test-Run', $testRun);
+}
+
 $app->map('notFound', fn() => $app->json(['error' => 'Endpoint not found.'], 404));
 $app->map('methodNotFound', function (Route $route) use ($app): void {
     $app->response()->header('Allow', implode(', ', $route->methods));
@@ -66,7 +89,7 @@ $resources = [
     '/api/maintenance-tasks' => MaintenanceTaskService::class,
     '/api/users' => UserService::class,
 ];
-$makeService = static fn(string $class): CrudService => new $class(Database::connect());
+$makeService = static fn(string $class): CrudService => new $class($testConnection ?? Database::connect());
 require dirname(__DIR__) . '/routes/crud.php';
 require dirname(__DIR__) . '/routes/releases.php';
 $app->start();

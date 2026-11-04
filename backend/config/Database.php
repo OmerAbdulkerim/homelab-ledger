@@ -13,11 +13,7 @@ final class Database
     public static function connect(?array $settings = null): PDO
     {
         if ($settings === null) {
-            $path = __DIR__ . '/local.php';
-            if (!is_file($path)) {
-                throw new RuntimeException('Copy config.example.php to local.php and configure MySQL.');
-            }
-            $config = require $path;
+            $config = self::localConfig();
             $settings = $config['database'] ?? [];
         }
 
@@ -47,5 +43,34 @@ final class Database
         $pdo->exec("SET SESSION sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
         $pdo->exec("SET SESSION time_zone = '+00:00'");
         return $pdo;
+    }
+
+    public static function connectForApiTests(): PDO
+    {
+        $config = self::localConfig();
+        $settings = $config['test_database'] ?? null;
+        $applicationName = $config['database']['name'] ?? null;
+        $testName = $settings['name'] ?? null;
+        if (!is_array($settings) || ($settings['host'] ?? null) !== '127.0.0.1'
+            || !is_string($applicationName) || !preg_match('/\A[a-zA-Z0-9_]+\z/', $applicationName)
+            || !is_string($testName) || !str_ends_with($testName, '_test')
+            || strcasecmp($applicationName, $testName) === 0) {
+            throw new RuntimeException('API tests require a separate loopback database ending in _test.');
+        }
+
+        $pdo = self::connect($settings);
+        if ($pdo->query('SELECT DATABASE()')->fetchColumn() !== $testName) {
+            throw new RuntimeException('API test database could not be verified.');
+        }
+        return $pdo;
+    }
+
+    private static function localConfig(): array
+    {
+        $path = __DIR__ . '/local.php';
+        if (!is_file($path)) {
+            throw new RuntimeException('Copy config.example.php to local.php and configure MySQL.');
+        }
+        return require $path;
     }
 }
