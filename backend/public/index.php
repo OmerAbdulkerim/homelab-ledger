@@ -57,4 +57,5 @@ $resources = [
 ];
 $makeService = static fn(string $class): CrudService => new $class(Database::connect());
 require dirname(__DIR__) . '/routes/crud.php';
+require dirname(__DIR__) . '/routes/releases.php';
 $app->start();

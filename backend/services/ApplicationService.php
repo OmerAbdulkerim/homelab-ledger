@@ -27,17 +27,10 @@ final class ApplicationService extends CrudService
         if (isset($data['github_owner']) || isset($data['github_repo'])) {
             $owner = $data['github_owner'] ?? $current['github_owner'] ?? '';
             $repo = $data['github_repo'] ?? $current['github_repo'] ?? '';
-            if (($owner !== '' || $repo !== '') && !self::validRepository($owner, $repo)) {
+            if (($owner !== '' || $repo !== '') && !GitHubReleaseService::validRepository($owner, $repo)) {
                 throw new InvalidArgumentException('Provide a valid GitHub owner and repository together, or leave both empty.');
             }
         }
         return $data;
-    }
-
-    private static function validRepository(string $owner, string $repo): bool
-    {
-        return preg_match('/\A[a-zA-Z0-9-]{1,100}\z/', $owner) === 1
-            && preg_match('/\A[a-zA-Z0-9_.-]{1,100}\z/', $repo) === 1
-            && !in_array($repo, ['.', '..'], true);
     }
 }
