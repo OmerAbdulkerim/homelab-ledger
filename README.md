@@ -12,8 +12,8 @@ returns conflicts for duplicate deployment labels or emails, restricted deletes,
 and attempts to remove or demote the last admin. New accounts start as regular
 users, and user responses exclude passwords and password hashes.
 
-Use PHP 8.1+ with `curl`, `mbstring` and `pdo_mysql`. Set up MySQL as described
-below and point the ignored `database` configuration
+Use 64-bit PHP 8.1+ with `ctype`, `curl`, `mbstring` and `pdo_mysql`. Set up
+MySQL as described below and point the ignored `database` configuration
 at a local database imported from the sample SQL. From the repository root, run:
 
 ```sh
@@ -26,6 +26,8 @@ Open [Swagger UI](http://127.0.0.1:8081/docs) or load the
 [OpenAPI document](http://127.0.0.1:8081/openapi.json). The preview accepts local
 loopback requests and has no authentication. Use only local sample data. The SPA
 runs separately on port 8080 with sample data until M4.
+Requests may contain at most 65,536 bytes in the body. Larger bodies return
+HTTP 413 before FlightPHP parses the input or opens a database connection.
 
 ## Milestone 2
 MySQL persistence now includes five tables, sample data and PDO CRUD DAOs with a
@@ -193,8 +195,9 @@ For a walkthrough, sign in as admin, inspect a deployment, try the release state
 and add/edit/delete a test record. Then sign in as the regular user and complete
 an assigned task. Refresh restores the sample data.
 
-Run `node tests/api-isolation.mjs` to check that the HTTP suite refuses unsafe
-targets. The CRUD suite needs a separate disposable `test_database` at
+Run `node tests/http-boundaries.mjs` to check the body limit using a temporary
+PHP server without database writes. Run `node tests/api-isolation.mjs` to check
+that the HTTP suite refuses unsafe targets. The CRUD suite needs a separate disposable `test_database` at
 `127.0.0.1` whose name ends in `_test` and differs from `database`. Import the
 sample SQL into that empty schema and use an account restricted to that schema.
 In a dedicated shell, start a test-mode server on a free port and wait for PHP

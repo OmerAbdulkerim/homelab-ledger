@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2fd8a58d7b09a411cd62d95a52d098a2",
+    "content-hash": "5bd71b518052832cb93ff396aee3cde6",
     "packages": [
         {
             "name": "flightphp/core",
@@ -100,6 +100,8 @@
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1",
+        "php-64bit": "^8.1",
+        "ext-ctype": "*",
         "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-pdo_mysql": "*"

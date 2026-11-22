@@ -31,6 +31,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -70,6 +73,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         },
         "requestBody": {
@@ -118,6 +124,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -152,6 +161,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         },
         "requestBody": {
@@ -183,6 +195,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       }
@@ -207,6 +222,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -263,6 +281,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       }
@@ -295,6 +316,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -344,6 +368,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -365,6 +392,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       }
@@ -428,6 +458,9 @@
                 }
               }
             }
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       }
@@ -452,6 +485,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -508,6 +544,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       }
@@ -540,6 +579,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -589,6 +631,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -610,6 +655,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       }
@@ -634,6 +682,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -689,6 +740,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       }
@@ -721,6 +775,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -770,6 +827,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -791,6 +851,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       }
@@ -815,6 +878,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -869,6 +935,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         },
         "description": "New accounts start as regular users. Passwords are hashed and excluded from responses."
@@ -902,6 +971,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         }
       },
@@ -946,6 +1018,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         },
         "description": "Change profile, password or role in the local preview. The final admin cannot be demoted."
@@ -968,6 +1043,9 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
           }
         },
         "description": "Task assignments for the deleted user are cleared. The final admin is protected."
@@ -983,38 +1061,38 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 80,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "hostname": {
             "type": "string",
             "minLength": 1,
             "maxLength": 253,
             "description": "Hostname or IP address.",
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "purpose": {
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "operating_system": {
             "type": ["string", "null"],
             "minLength": 1,
             "maxLength": 100,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "os_version": {
             "type": ["string", "null"],
             "minLength": 1,
             "maxLength": 100,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "cpu_model": {
             "type": ["string", "null"],
             "minLength": 1,
             "maxLength": 160,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "cpu_cores": {
             "type": ["integer", "null"],
@@ -1119,13 +1197,13 @@
             "type": "string",
             "maxLength": 80,
             "minLength": 1,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "description": {
             "type": "string",
             "maxLength": 500,
             "minLength": 1,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "github_owner": {
             "type": "string",
@@ -1237,7 +1315,7 @@
             "type": "string",
             "maxLength": 80,
             "minLength": 1,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "installed_version": {
             "type": "string",
@@ -1368,7 +1446,7 @@
             "type": "string",
             "maxLength": 160,
             "minLength": 1,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "description": {
             "type": "string",
@@ -1490,13 +1568,13 @@
             "type": "string",
             "maxLength": 80,
             "minLength": 1,
-            "pattern": "[^\\s\\u0085]"
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "email": {
             "type": "string",
             "maxLength": 254,
             "minLength": 1,
-            "pattern": "[^\\s\\u0085]",
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]",
             "format": "email"
           }
         }
@@ -1703,6 +1781,16 @@
       },
       "InternalError": {
         "description": "The server could not complete the request.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "PayloadTooLarge": {
+        "description": "Request body exceeds the 65,536-byte limit.",
         "content": {
           "application/json": {
             "schema": {

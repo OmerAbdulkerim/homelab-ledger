@@ -20,6 +20,32 @@ if (PHP_SAPI !== 'cli-server'
     exit;
 }
 
+if (PHP_INT_SIZE < 8) {
+    http_response_code(503);
+    header('Content-Type: application/json');
+    echo '{"error":"The API requires 64-bit PHP."}';
+    exit;
+}
+
+// Bound the raw input before Flight constructs and parses its request.
+$maxRequestBytes = 65536;
+if ((int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > $maxRequestBytes) {
+    http_response_code(413);
+    header('Content-Type: application/json');
+    echo '{"error":"Request body exceeds 65536 bytes."}';
+    exit;
+}
+$requestBody = file_get_contents('php://input', false, null, 0, $maxRequestBytes + 1);
+if ($requestBody === false || strlen($requestBody) > $maxRequestBytes) {
+    http_response_code($requestBody === false ? 400 : 413);
+    header('Content-Type: application/json');
+    echo $requestBody === false
+        ? '{"error":"Request body could not be read."}'
+        : '{"error":"Request body exceeds 65536 bytes."}';
+    exit;
+}
+unset($requestBody);
+
 $root = dirname(__DIR__, 2);
 require $root . '/vendor/autoload.php';
 
