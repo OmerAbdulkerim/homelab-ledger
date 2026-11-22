@@ -32,6 +32,14 @@ async function send(path, method, body, contentType = 'application/json') {
   return response;
 }
 
+async function assertDeleted(response) {
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get('content-type'), /^application\/json/);
+  assert.deepEqual(await response.json(), {
+    message: 'Record deleted successfully.',
+  });
+}
+
 const seedUsers = [
   { id: 1, email: 'admin@homelab.example', role: 'admin' },
   { id: 2, email: 'user@homelab.example', role: 'user' },
@@ -52,6 +60,15 @@ assert.ok(
 usersBefore.forEach(noCredentials);
 
 const spec = await (await send('/openapi.json', 'GET')).json();
+for (const path of Object.values(spec.paths)) {
+  if (path.delete) {
+    assert.equal(path.delete.responses['204'], undefined);
+    assert.equal(
+      path.delete.responses['200'].$ref,
+      '#/components/responses/RecordDeleted',
+    );
+  }
+}
 assert.deepEqual(Object.keys(spec.paths[collection]).sort(), ['get', 'post']);
 assert.deepEqual(Object.keys(spec.paths[`${collection}/{id}`]).sort(), [
   'delete',
@@ -132,12 +149,11 @@ try {
     'PATCH',
   ]);
 } finally {
-  const removed = await send(path, 'DELETE');
-  assert.equal(removed.status, 204);
-  assert.equal(await removed.text(), '');
+  await assertDeleted(await send(path, 'DELETE'));
 }
 
 assert.equal((await send(path, 'GET')).status, 404);
+assert.equal((await send(path, 'DELETE')).status, 404);
 console.log('PASS: server CRUD, validation and OpenAPI HTTP checks.');
 
 for (const name of [
@@ -374,7 +390,7 @@ try {
   const reopened = await expect(task.path, 'PATCH', 200, { status: 'open' });
   assert.equal(reopened.data.completed_at, null);
   await expect(deployment.path, 'DELETE', 409);
-  await expect(user.path, 'DELETE', 204);
+  await assertDeleted(await send(user.path, 'DELETE'));
   assert.equal(
     (await expect(task.path, 'GET', 200)).data.assigned_user_id,
     null,
@@ -387,10 +403,12 @@ try {
     try {
       const response = await send(path, 'DELETE');
       assert.ok(
-        [204, 404].includes(response.status),
+        [200, 404].includes(response.status),
         `Cleanup failed for ${path} (${response.status})`,
       );
+      if (response.status === 200) await assertDeleted(response);
       await expect(path, 'GET', 404);
+      await expect(path, 'DELETE', 404);
     } catch (error) {
       errors.push(error);
     }

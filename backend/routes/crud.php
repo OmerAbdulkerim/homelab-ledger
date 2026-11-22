@@ -57,7 +57,7 @@ foreach ($resources as $path => $serviceClass) {
             if (!$records->delete($id)) {
                 throw new DomainException('Record not found.', 404);
             }
-            $app->response()->status(204);
+            $app->json(['message' => 'Record deleted successfully.'], 200);
             return;
         }
 

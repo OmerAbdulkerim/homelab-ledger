@@ -181,9 +181,6 @@
         "tags": ["Servers"],
         "summary": "Delete a server",
         "responses": {
-          "204": {
-            "description": "Server deleted."
-          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -198,6 +195,9 @@
           },
           "413": {
             "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
           }
         }
       }
@@ -378,9 +378,6 @@
         "tags": ["Applications"],
         "summary": "Delete a application",
         "responses": {
-          "204": {
-            "description": "Application deleted."
-          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -395,6 +392,9 @@
           },
           "413": {
             "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
           }
         }
       }
@@ -641,9 +641,6 @@
         "tags": ["Deployments"],
         "summary": "Delete a deployment",
         "responses": {
-          "204": {
-            "description": "Deployment deleted."
-          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -658,6 +655,9 @@
           },
           "413": {
             "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
           }
         }
       }
@@ -837,9 +837,6 @@
         "tags": ["Maintenance tasks"],
         "summary": "Delete a maintenance task",
         "responses": {
-          "204": {
-            "description": "MaintenanceTask deleted."
-          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -854,6 +851,9 @@
           },
           "413": {
             "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
           }
         }
       }
@@ -1029,9 +1029,6 @@
         "tags": ["Users"],
         "summary": "Delete a user",
         "responses": {
-          "204": {
-            "description": "User deleted."
-          },
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
@@ -1046,6 +1043,9 @@
           },
           "413": {
             "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
           }
         },
         "description": "Task assignments for the deleted user are cleared. The final admin is protected."
@@ -1795,6 +1795,27 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "RecordDeleted": {
+        "description": "Record deleted successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["message"],
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "const": "Record deleted successfully."
+                }
+              },
+              "additionalProperties": false
+            },
+            "example": {
+              "message": "Record deleted successfully."
             }
           }
         }
