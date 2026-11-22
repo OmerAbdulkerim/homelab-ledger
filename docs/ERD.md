@@ -66,7 +66,7 @@ erDiagram
     }
 ```
 
-- All five entities have admin CRUD in the planned API and M1 mock UI.
+- All five entities have CRUD in the M3 loopback API and the M1 mock UI.
 - Exactly one task target is required: server_id XOR deployment_id. The ERD's
   optional target edges express each column's nullability, not a targetless task.
 - Each deployment has one application and server. Multiple instances on the same
@@ -79,12 +79,13 @@ erDiagram
   data is external/cache data, not a sixth CRUD entity.
 - Foreign keys restrict deletion of servers/applications with deployments and
   server/deployment targets with task history. Deleting a user sets task
-  assignments to NULL. Protecting the last admin and active account is a future
-  service rule; the DAO has no actor/authentication context.
+  assignments to NULL. The M3 user service protects the last admin. Active
+  account protection requires the authenticated actor in M4.
 - Enforced MySQL CHECK constraints require exactly one task target, a nonblank
   outcome and completion time for completed tasks, an installed version for
   non-planned deployments, and both GitHub fields or neither. Non-completed tasks
-  have a NULL completion time. Services must also validate these rules in M3/M4.
+  have a NULL completion time. M3 services validate these rules before writing
+  and manage task completion times in UTC.
 - No dedicated deployment history table in the first version. Completed tasks
   retain maintenance outcomes; current version updates are not an audit trail.
 - Server specifications are optional, manually recorded inventory. NULL means
@@ -108,7 +109,7 @@ erDiagram
   compare equal to empty under the configured collation. A supplied pair must pass
   both nonblank predicates, including when both fields contain whitespace.
 - Email and deployment-instance uniqueness are case-insensitive and accent-sensitive
-  through utf8mb4_0900_as_ci. Services will normalize/trim input before DAO calls.
+  through utf8mb4_0900_as_ci. The API preserves valid supplied text.
 - Existing optional notes, outcomes, URLs, versions and repository fields default
   to an empty string. Optional dates, task targets and assignees use SQL NULL. completed_at is a UTC DATETIME; PDO sessions use UTC.
 - Server operating_system and os_version allow 100 characters; cpu_model allows
@@ -118,7 +119,7 @@ erDiagram
 - cpu_cores is a nullable SMALLINT UNSIGNED (1–65,535). ram_mib and storage_gib
   are nullable INT UNSIGNED values (1–4,294,967,295), recording whole MiB and GiB
   respectively: 32 GiB of RAM is 32,768 MiB. Zero is not a substitute for unknown.
-  Numeric format validation before MySQL coercion belongs to the M3 services.
+  M3 services validate numeric formats before MySQL can coerce them.
 - Servers and deployments have created_at and updated_at as UTC DATETIME(6).
   MySQL CURRENT_TIMESTAMP(6) defaults populate both on insertion; ON UPDATE changes
   updated_at only when stored values change. No-op updates preserve both times.
@@ -133,6 +134,6 @@ erDiagram
   The M4 service adapter will map names, empty dates to NULL and completion dates
   between JavaScript ISO strings and UTC SQL DATETIME values. It must also map
   cleared optional specification inputs to NULL and retain the documented units.
-- URL scheme/credentials, hostname syntax, email syntax, GitHub identifier syntax,
-  password policies, permission checks and API response redaction are service-layer
-  validation in M3/M4. Direct DAO access is not an authorization boundary.
+- M3 services validate URL, hostname, email and GitHub identifier syntax. The
+  user service hashes passwords and excludes credential fields from API
+  responses. Authentication and permissions arrive in M4.

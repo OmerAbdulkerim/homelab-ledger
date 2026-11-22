@@ -82,3 +82,34 @@ These issues were identified and corrected during code review and browser testin
    regressions first failed on a tab-only user name against the old schema. The
    SQL now uses REGEXP_LIKE to require a character outside ICU Unicode whitespace
    and U+FEFF.
+
+## Milestone 3 — 22 November 2026
+
+### Tools used
+
+- I used Codex to implement the PHP services, FlightPHP routes, GitHub release
+  lookup and OpenAPI documentation, and to run local API and database checks.
+- I used the Improve skill to review the M3 changes and write plans for test
+  database isolation, GitHub redirects and OpenAPI validation rules.
+- The Ponytail skill guided reuse of the existing PDO DAOs and a small
+  FlightPHP setup.
+
+### Important prompts and decisions
+
+- extended the first server API to the other four entities.
+- Kept the frontend on sample data until M4, with Swagger UI for testing the
+  API separately. Automated checks used disposable MySQL databases.
+
+### Actual mistakes and corrections
+
+1. **The HTTP 405 response listed only some supported methods.** The first route
+   definitions registered each HTTP method separately. A request using an
+   unsupported method returned HTTP 405, but its `Allow` header listed only
+   the methods from the last matching route. Grouping methods by URL path
+   corrected the header. The HTTP test now checks the complete method list.
+
+2. **The last-admin check returned an internal error.** The namespaced user DAO
+   used `PDO::FETCH_COLUMN` without importing PDO. The HTTP integration test
+   exposed the missing import when checking user deletion. Adding the import
+   corrected the lookup. The tests then passed for user deletion and for
+   rejecting deletion or demotion of the final admin.

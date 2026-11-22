@@ -9,14 +9,13 @@ in the future. The app will never deploy applications automatically.
 ## Stack and architecture
 The frontend uses HTML, CSS and JavaScript as a SPA. The backend will use PHP
 with FlightPHP, MySQL and PDO. Routes receive requests, services handle the
-rules, and DAOs query the database. The frontend still uses M1 sample data;
-M2 adds independently tested MySQL persistence.
+rules, and DAOs query the database. The frontend still uses M1 sample data.
 
 - Only backend services call DAOs. Use PDO prepared statements for queries.
 - Each of the five entities gets a service and DAO; share a reusable base DAO.
 - M2 DAOs accept a PDO connection from backend/config/Database.php. Table and
   writable column names are fixed in each DAO; bind all values. CLI tests may
-  call DAOs directly; production callers must be services when M3 arrives.
+  call DAOs directly; application code calls DAOs through services.
 - Frontend views render content, controllers coordinate actions, and only service
   modules communicate with the backend. Navigation must not reload the full page.
 - Document every endpoint with OpenAPI and provide Swagger UI when routes arrive
@@ -53,7 +52,9 @@ Work only on the current milestone. Enforce authentication and permissions in
 the backend, and register new accounts as regular users. Keep secrets and logs
 out of Git and don’t expose internal errors.
 
-- Current milestone: M2, MySQL schema, sample SQL export and five CRUD DAOs.
+- Current milestone: M3, services, FlightPHP routes, GitHub releases and OpenAPI.
+  Bind the unauthenticated M3 API preview to loopback with `backend/public` as
+  its document root. Use sample data for local API checks.
 - Use MySQL 8.0.16+ with enforced CHECK constraints, InnoDB and utf8mb4. Import
   database/homelab-ledger.sql into an empty database. Store completion times in UTC.
 - Required text must contain something other than Unicode whitespace or U+FEFF.
@@ -62,8 +63,7 @@ out of Git and don’t expose internal errors.
   use NULL for unknown values, whole MiB for RAM and GiB for storage. They are
   recorded inventory, not live measurements. Server/deployment created_at and
   updated_at are UTC database-managed fields and are read-only through DAOs.
-- Keep the frontend on sample data until M4. Routes, services and external API
-  calls start in M3; do not add them to M2.
+- Keep the frontend on sample data until M4.
 - M2 adds MySQL/DAOs; M3 services/routes/GitHub/OpenAPI;
   M4 JWT/roles/middleware/logging/full integration; M5 final validation/deployment.
 - Missing, invalid or expired JWT: 401. Insufficient permissions: 403.
