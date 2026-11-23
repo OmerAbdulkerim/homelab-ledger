@@ -1,0 +1,1835 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Homelab Ledger API",
+    "version": "0.3.0",
+    "description": "Milestone 3 API for local sample data. This loopback preview has no authentication. Deployment statuses and server specifications describe recorded inventory."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/api/servers": {
+      "get": {
+        "tags": ["Servers"],
+        "summary": "List servers by ID",
+        "responses": {
+          "200": {
+            "description": "Server records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Server"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Servers"],
+        "summary": "Create a server",
+        "responses": {
+          "201": {
+            "description": "Server created.",
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL path of the new server."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Server"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServerCreate"
+              },
+              "example": {
+                "name": "Archive server",
+                "hostname": "archive.example.test",
+                "purpose": "Sample storage",
+                "ram_mib": 4096
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/servers/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RecordId"
+        }
+      ],
+      "get": {
+        "tags": ["Servers"],
+        "summary": "Get a server",
+        "responses": {
+          "200": {
+            "description": "Server record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Server"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Servers"],
+        "summary": "Update supplied server fields",
+        "responses": {
+          "200": {
+            "description": "Server record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Server"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServerPatch"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Servers"],
+        "summary": "Delete a server",
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
+          }
+        }
+      }
+    },
+    "/api/applications": {
+      "get": {
+        "tags": ["Applications"],
+        "summary": "List applications by ID",
+        "responses": {
+          "200": {
+            "description": "Applications records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Application"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Applications"],
+        "summary": "Create a application",
+        "description": "Provide a GitHub owner and repository together. Clear a link by setting both fields to empty strings.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationCreate"
+              },
+              "example": {
+                "name": "Immich",
+                "description": "Photo library",
+                "github_owner": "immich-app",
+                "github_repo": "immich"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Application created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Application"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL path of the created record."
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      }
+    },
+    "/api/applications/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RecordId"
+        }
+      ],
+      "get": {
+        "tags": ["Applications"],
+        "summary": "Get a application",
+        "responses": {
+          "200": {
+            "description": "Application record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Application"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Applications"],
+        "summary": "Update supplied application fields",
+        "description": "Omitted fields retain their saved values. The service validates the repository pair after applying supplied fields. Use empty strings for both fields to unlink the application.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApplicationPatch"
+              },
+              "example": {
+                "github_owner": "",
+                "github_repo": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Application record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Application"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Applications"],
+        "summary": "Delete a application",
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
+          }
+        }
+      }
+    },
+    "/api/applications/{id}/release": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RecordId"
+        }
+      ],
+      "get": {
+        "tags": ["Applications"],
+        "summary": "Get the latest published GitHub release",
+        "description": "Reads the GitHub repository saved on the application and returns the published tag and release-notes link when available.",
+        "responses": {
+          "200": {
+            "description": "Release information, a reachable repository with no release, or an unlinked application.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ReleaseAvailable"
+                    },
+                    {
+                      "$ref": "#/components/schemas/NoRelease"
+                    },
+                    {
+                      "$ref": "#/components/schemas/UnlinkedRelease"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "502": {
+            "description": "GitHub is unavailable, the repository is inaccessible, or the upstream response is invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseUnavailable"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "GitHub rate limited the lookup.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReleaseRateLimited"
+                }
+              }
+            }
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      }
+    },
+    "/api/deployments": {
+      "get": {
+        "tags": ["Deployments"],
+        "summary": "List deployments by ID",
+        "responses": {
+          "200": {
+            "description": "Deployments records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Deployment"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Deployments"],
+        "summary": "Create a deployment",
+        "description": "A label identifies an instance of an application on a server. Running and stopped deployments require a nonblank installed version.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeploymentCreate"
+              },
+              "example": {
+                "application_id": 1,
+                "server_id": 1,
+                "label": "staging-example",
+                "status": "planned"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Deployment created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deployment"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL path of the created record."
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      }
+    },
+    "/api/deployments/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RecordId"
+        }
+      ],
+      "get": {
+        "tags": ["Deployments"],
+        "summary": "Get a deployment",
+        "responses": {
+          "200": {
+            "description": "Deployment record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deployment"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Deployments"],
+        "summary": "Update supplied deployment fields",
+        "description": "Omitted fields retain their saved values. The resulting running or stopped deployment must have a nonblank installed version.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeploymentPatch"
+              },
+              "example": {
+                "status": "running",
+                "installed_version": "v1.2.3"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deployment record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Deployment"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Deployments"],
+        "summary": "Delete a deployment",
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
+          }
+        }
+      }
+    },
+    "/api/maintenance-tasks": {
+      "get": {
+        "tags": ["Maintenance tasks"],
+        "summary": "List maintenance tasks by ID",
+        "responses": {
+          "200": {
+            "description": "Maintenance tasks records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MaintenanceTask"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Maintenance tasks"],
+        "summary": "Create a maintenance task",
+        "description": "Exactly one target is required. When switching target type, set the old field to null. Completing a task requires a nonblank outcome. Reopening clears the completion time.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaintenanceTaskCreate"
+              },
+              "example": {
+                "title": "Check backups",
+                "server_id": 1,
+                "due_on": "2026-11-30"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "MaintenanceTask created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintenanceTask"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL path of the created record."
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      }
+    },
+    "/api/maintenance-tasks/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RecordId"
+        }
+      ],
+      "get": {
+        "tags": ["Maintenance tasks"],
+        "summary": "Get a maintenance task",
+        "responses": {
+          "200": {
+            "description": "MaintenanceTask record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintenanceTask"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Maintenance tasks"],
+        "summary": "Update supplied maintenance task fields",
+        "description": "Omitted fields retain their saved values. The resulting task must have exactly one target. When switching target type, set the old field to null and use the ID of an existing server or deployment. The example assumes deployment 1 exists. Completing a task requires a nonblank outcome. Reopening clears the completion time.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaintenanceTaskPatch"
+              },
+              "example": {
+                "server_id": null,
+                "deployment_id": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "MaintenanceTask record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintenanceTask"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Maintenance tasks"],
+        "summary": "Delete a maintenance task",
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "List users by ID",
+        "responses": {
+          "200": {
+            "description": "Users records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Users"],
+        "summary": "Create a user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              },
+              "example": {
+                "name": "Sample account",
+                "email": "sample@example.test",
+                "password": "local-example-password"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "URL path of the created record."
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        },
+        "description": "New accounts start as regular users. Passwords are hashed and excluded from responses."
+      }
+    },
+    "/api/users/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RecordId"
+        }
+      ],
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get a user",
+        "responses": {
+          "200": {
+            "description": "User record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Update supplied user fields",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          }
+        },
+        "description": "Change profile, password or role in the local preview. The final admin cannot be demoted."
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete a user",
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "413": {
+            "$ref": "#/components/responses/PayloadTooLarge"
+          },
+          "200": {
+            "$ref": "#/components/responses/RecordDeleted"
+          }
+        },
+        "description": "Task assignments for the deleted user are cleared. The final admin is protected."
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ServerFields": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "hostname": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "description": "Hostname or IP address.",
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "operating_system": {
+            "type": ["string", "null"],
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "os_version": {
+            "type": ["string", "null"],
+            "minLength": 1,
+            "maxLength": 100,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "cpu_model": {
+            "type": ["string", "null"],
+            "minLength": 1,
+            "maxLength": 160,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "cpu_cores": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "maximum": 65535,
+            "description": "Logical or physical core count as recorded in inventory."
+          },
+          "ram_mib": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "maximum": 4294967295,
+            "description": "RAM in whole MiB."
+          },
+          "storage_gib": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "maximum": 4294967295,
+            "description": "Storage in whole GiB."
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 5000
+          }
+        }
+      },
+      "ServerCreate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ServerFields"
+          }
+        ],
+        "required": ["name", "hostname", "purpose"],
+        "unevaluatedProperties": false
+      },
+      "ServerPatch": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ServerFields"
+          }
+        ],
+        "minProperties": 1,
+        "unevaluatedProperties": false
+      },
+      "Server": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ServerFields"
+          }
+        ],
+        "required": [
+          "id",
+          "name",
+          "hostname",
+          "purpose",
+          "operating_system",
+          "os_version",
+          "cpu_model",
+          "cpu_cores",
+          "ram_mib",
+          "storage_gib",
+          "notes",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295,
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Database-managed UTC time in YYYY-MM-DD HH:MM:SS.ffffff format.",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Database-managed UTC time in YYYY-MM-DD HH:MM:SS.ffffff format.",
+            "readOnly": true
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "RecordId": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 4294967295
+      },
+      "ApplicationFields": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "minLength": 1,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "github_owner": {
+            "type": "string",
+            "maxLength": 100,
+            "default": ""
+          },
+          "github_repo": {
+            "type": "string",
+            "maxLength": 100,
+            "default": ""
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 5000,
+            "default": ""
+          }
+        }
+      },
+      "Application": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationFields"
+          }
+        ],
+        "required": [
+          "id",
+          "name",
+          "description",
+          "github_owner",
+          "github_repo",
+          "notes"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295,
+            "readOnly": true
+          }
+        }
+      },
+      "ApplicationCreate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationFields"
+          }
+        ],
+        "required": ["name", "description"],
+        "unevaluatedProperties": false,
+        "properties": {
+          "github_owner": {
+            "pattern": "^(?:[a-zA-Z0-9-]{1,100})?$"
+          },
+          "github_repo": {
+            "pattern": "^(?!\\.{1,2}$)[a-zA-Z0-9_.-]{0,100}$"
+          }
+        },
+        "anyOf": [
+          {
+            "properties": {
+              "github_owner": {
+                "const": ""
+              },
+              "github_repo": {
+                "const": ""
+              }
+            }
+          },
+          {
+            "required": ["github_owner", "github_repo"],
+            "properties": {
+              "github_owner": {
+                "minLength": 1
+              },
+              "github_repo": {
+                "minLength": 1
+              }
+            }
+          }
+        ]
+      },
+      "ApplicationPatch": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApplicationFields"
+          }
+        ],
+        "minProperties": 1,
+        "unevaluatedProperties": false,
+        "properties": {
+          "github_owner": {
+            "pattern": "^(?:[a-zA-Z0-9-]{1,100})?$"
+          },
+          "github_repo": {
+            "pattern": "^(?!\\.{1,2}$)[a-zA-Z0-9_.-]{0,100}$"
+          }
+        }
+      },
+      "DeploymentFields": {
+        "type": "object",
+        "properties": {
+          "application_id": {
+            "$ref": "#/components/schemas/RecordId"
+          },
+          "server_id": {
+            "$ref": "#/components/schemas/RecordId"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "installed_version": {
+            "type": "string",
+            "maxLength": 100,
+            "default": ""
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 2048,
+            "description": "HTTP or HTTPS URL without embedded credentials, or an empty string.",
+            "default": ""
+          },
+          "status": {
+            "type": "string",
+            "enum": ["running", "stopped", "planned"],
+            "default": "planned"
+          },
+          "deployed_on": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Recorded deployment date.",
+            "default": null
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 5000,
+            "default": ""
+          }
+        }
+      },
+      "Deployment": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeploymentFields"
+          }
+        ],
+        "required": [
+          "id",
+          "application_id",
+          "server_id",
+          "label",
+          "installed_version",
+          "url",
+          "status",
+          "deployed_on",
+          "notes",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295,
+            "readOnly": true
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Database-managed UTC time in YYYY-MM-DD HH:MM:SS.ffffff format.",
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Database-managed UTC time in YYYY-MM-DD HH:MM:SS.ffffff format.",
+            "readOnly": true
+          }
+        }
+      },
+      "DeploymentCreate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeploymentFields"
+          }
+        ],
+        "required": ["application_id", "server_id", "label"],
+        "unevaluatedProperties": false,
+        "if": {
+          "required": ["status"],
+          "properties": {
+            "status": {
+              "enum": ["running", "stopped"]
+            }
+          }
+        },
+        "then": {
+          "required": ["installed_version"],
+          "properties": {
+            "installed_version": {
+              "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+            }
+          }
+        }
+      },
+      "DeploymentPatch": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/DeploymentFields"
+          }
+        ],
+        "minProperties": 1,
+        "unevaluatedProperties": false
+      },
+      "MaintenanceTaskFields": {
+        "type": "object",
+        "properties": {
+          "server_id": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "maximum": 4294967295,
+            "description": "Server target. Use exactly one of server_id and deployment_id.",
+            "default": null
+          },
+          "deployment_id": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "maximum": 4294967295,
+            "description": "Deployment target. Use exactly one of server_id and deployment_id.",
+            "default": null
+          },
+          "assigned_user_id": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "maximum": 4294967295,
+            "description": "Assigned user, if any.",
+            "default": null
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 160,
+            "minLength": 1,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 5000,
+            "default": ""
+          },
+          "status": {
+            "type": "string",
+            "enum": ["open", "in_progress", "completed"],
+            "default": "open"
+          },
+          "due_on": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Task due date.",
+            "default": null
+          },
+          "outcome": {
+            "type": "string",
+            "maxLength": 5000,
+            "default": ""
+          }
+        }
+      },
+      "MaintenanceTask": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MaintenanceTaskFields"
+          }
+        ],
+        "required": [
+          "id",
+          "server_id",
+          "deployment_id",
+          "assigned_user_id",
+          "title",
+          "description",
+          "status",
+          "due_on",
+          "outcome",
+          "completed_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295,
+            "readOnly": true
+          },
+          "completed_at": {
+            "type": ["string", "null"],
+            "readOnly": true,
+            "description": "Service-managed UTC completion time in YYYY-MM-DD HH:MM:SS format."
+          }
+        }
+      },
+      "MaintenanceTaskCreate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MaintenanceTaskFields"
+          }
+        ],
+        "required": ["title"],
+        "unevaluatedProperties": false,
+        "oneOf": [
+          {
+            "required": ["server_id"],
+            "properties": {
+              "server_id": {
+                "type": "integer"
+              },
+              "deployment_id": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "required": ["deployment_id"],
+            "properties": {
+              "deployment_id": {
+                "type": "integer"
+              },
+              "server_id": {
+                "type": "null"
+              }
+            }
+          }
+        ],
+        "if": {
+          "required": ["status"],
+          "properties": {
+            "status": {
+              "const": "completed"
+            }
+          }
+        },
+        "then": {
+          "required": ["outcome"],
+          "properties": {
+            "outcome": {
+              "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+            }
+          }
+        }
+      },
+      "MaintenanceTaskPatch": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/MaintenanceTaskFields"
+          }
+        ],
+        "minProperties": 1,
+        "unevaluatedProperties": false
+      },
+      "UserFields": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "minLength": 1,
+            "pattern": "[^\\u0009-\\u000d\\u0020\\u0085\\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]",
+            "format": "email"
+          }
+        }
+      },
+      "User": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserFields"
+          }
+        ],
+        "required": ["id", "name", "email", "role"],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295,
+            "readOnly": true
+          },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "user"],
+            "description": "New accounts start as regular users."
+          }
+        }
+      },
+      "UserCreate": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserFields"
+          }
+        ],
+        "required": ["name", "email", "password"],
+        "unevaluatedProperties": false,
+        "properties": {
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "maxLength": 72,
+            "writeOnly": true,
+            "description": "At least 8 characters and at most 72 UTF-8 bytes, with no NUL characters."
+          }
+        }
+      },
+      "UserPatch": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserFields"
+          }
+        ],
+        "minProperties": 1,
+        "unevaluatedProperties": false,
+        "properties": {
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "maxLength": 72,
+            "writeOnly": true,
+            "description": "At least 8 characters and at most 72 UTF-8 bytes, with no NUL characters."
+          },
+          "role": {
+            "type": "string",
+            "enum": ["admin", "user"]
+          }
+        }
+      },
+      "ReleaseAvailable": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "const": "available"
+          },
+          "name": {
+            "type": "string",
+            "description": "GitHub owner/repository."
+          },
+          "repositoryUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "tag": {
+            "type": "string"
+          },
+          "releaseUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "published": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "state",
+          "name",
+          "repositoryUrl",
+          "tag",
+          "releaseUrl",
+          "published"
+        ]
+      },
+      "NoRelease": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "const": "no-release"
+          },
+          "name": {
+            "type": "string",
+            "description": "GitHub owner/repository."
+          },
+          "repositoryUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": ["state", "name", "repositoryUrl"]
+      },
+      "UnlinkedRelease": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "const": "unlinked"
+          }
+        },
+        "required": ["state"]
+      },
+      "ReleaseUnavailable": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "const": "unavailable"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["state", "message"]
+      },
+      "ReleaseRateLimited": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "const": "rate-limited"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["state", "message"]
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid ID or malformed JSON body.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Record not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "The write conflicts with an existing record, a dependency, the last admin, or a concurrent change.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "UnsupportedMediaType": {
+        "description": "Use application/json.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "A field or reference is missing, invalid or read-only.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "The server could not complete the request.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "PayloadTooLarge": {
+        "description": "Request body exceeds the 65,536-byte limit.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "RecordDeleted": {
+        "description": "Record deleted successfully.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["message"],
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "const": "Record deleted successfully."
+                }
+              },
+              "additionalProperties": false
+            },
+            "example": {
+              "message": "Record deleted successfully."
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "RecordId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/RecordId"
+        }
+      }
+    }
+  }
+}

@@ -20,5 +20,5 @@ return [
         'password' => 'replace-me',
     ],
     'jwt_secret' => 'replace-with-a-random-secret-in-m4',
-    'github_token' => null,
+    'github_token' => null, // Optional for GitHub release lookup.
 ];

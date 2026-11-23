@@ -24,10 +24,14 @@ abstract class BaseDao
         return $statement->fetchAll();
     }
 
-    public function getById(int $id): ?array
+    public function getById(int $id, bool $forUpdate = false): ?array
     {
         $this->validateId($id);
-        $statement = $this->pdo->prepare('SELECT * FROM `' . static::TABLE . '` WHERE id = :id');
+        if ($forUpdate && !$this->pdo->inTransaction()) {
+            throw new RuntimeException('A row lock requires a transaction.');
+        }
+        $sql = 'SELECT * FROM `' . static::TABLE . '` WHERE id = :id';
+        $statement = $this->pdo->prepare($sql . ($forUpdate ? ' FOR UPDATE' : ''));
         $statement->execute(['id' => $id]);
         return $statement->fetch() ?: null;
     }

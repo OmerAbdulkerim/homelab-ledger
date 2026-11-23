@@ -3,6 +3,32 @@
 A Web Programming course project for tracking servers, self-hosted applications,
 installed versions and maintenance tasks in a shared homelab.
 
+## Milestone 3
+
+The local FlightPHP API supports listing, creating, reading, partially updating
+and deleting servers, applications, deployments, maintenance tasks and users.
+Services validate requests, and the M2 DAOs persist records in MySQL. The API
+returns conflicts for duplicate deployment labels or emails, restricted deletes,
+and attempts to remove or demote the last admin. New accounts start as regular
+users, and user responses exclude passwords and password hashes.
+
+Use 64-bit PHP 8.1+ with `ctype`, `curl`, `mbstring` and `pdo_mysql`. Set up
+MySQL as described below and point the ignored `database` configuration
+at a local database imported from the sample SQL. From the repository root, run:
+
+```sh
+composer install
+npm ci
+php -S 127.0.0.1:8081 -t backend/public backend/public/index.php
+```
+
+Open [Swagger UI](http://127.0.0.1:8081/docs) or load the
+[OpenAPI document](http://127.0.0.1:8081/openapi.json). The preview accepts local
+loopback requests and has no authentication. Use only local sample data. The SPA
+runs separately on port 8080 with sample data until M4.
+Requests may contain at most 65,536 bytes in the body. Larger bodies return
+HTTP 413 before FlightPHP parses the input or opens a database connection.
+
 ## Milestone 2
 MySQL persistence now includes five tables, sample data and PDO CRUD DAOs with a
 shared base class. The [SQL export](database/homelab-ledger.sql) targets MySQL
@@ -18,8 +44,8 @@ The sample specifications and timestamps are synthetic, not detected hardware.
 The static SPA includes login, registration, profile editing and CRUD screens for
 users, servers, applications, deployments and maintenance. It uses sample data
 and demo authentication; frontend changes still reset on refresh. The database
-is independent of the UI in M2. Services, FlightPHP routes and live GitHub requests
-arrive in M3; JWT authentication and frontend integration arrive in M4.
+is independent of the UI until JWT authentication and frontend integration arrive
+in M4.
 
 ## Entities and roles
 A deployment links an application to a server. Labels distinguish instances such
@@ -101,20 +127,27 @@ accept a PDO connection and inherit these methods from `BaseDao`:
 | `delete($id)` | `true` if a row was deleted, otherwise `false` |
 
 `UserDao::getByEmail()` provides an internal credential lookup. DAO rows include
-`password_hash`; future services must hash incoming passwords and exclude hashes
-from API responses. DAOs enforce writable field names and value types; SQL
-rejects invalid relationships and structural data. Business validation and
-authorization remain M3/M4 work. PDO exceptions stay internal until centralized
-HTTP error handling is added; these files expose no API endpoints.
+`password_hash`, which the user service removes from API responses. DAOs enforce
+writable field names and value types, and SQL enforces structural constraints
+and relationships. The API converts database errors to client-safe responses.
 
 ## GitHub releases
-The planned GitHub API feature shows the latest published release beside a
-deployment's installed version and links to release notes. M1 uses labelled sample
-responses. The preview selector demonstrates a release, no release and a failed
-request. Inventory remains usable in each state. The backend integration arrives
-in M3, with the connected frontend in M4.
 
-Swagger link: pending M3. Live application link: pending M5.
+`GET /api/applications/{id}/release` looks up the latest published release for
+the repository saved on an application. For a release it returns the tag,
+publication time and release-notes URL. An unlinked application or a readable
+repository with no release returns its own state. Provider failures and rate
+limits return `502` and `503` respectively.
+
+Public repositories work without a token. An optional `github_token` belongs in
+the ignored backend config. Fine-grained tokens need Contents read permission
+for the repository. [GitHub releases API](https://docs.github.com/en/rest/releases/releases#get-the-latest-release)
+
+The static SPA still demonstrates the upstream states with sample data. M4 will
+connect it to the API and display the release beside the recorded installed
+version.
+
+Live application link: pending M5.
 
 ## Checks
 
@@ -161,6 +194,28 @@ Service checks cover CRUD, relationships, permissions and validation.
 For a walkthrough, sign in as admin, inspect a deployment, try the release states
 and add/edit/delete a test record. Then sign in as the regular user and complete
 an assigned task. Refresh restores the sample data.
+
+Run `node tests/http-boundaries.mjs` to check the body limit using a temporary
+PHP server without database writes. Run `node tests/api-isolation.mjs` to check
+that the HTTP suite refuses unsafe targets. The CRUD suite needs a separate disposable `test_database` at
+`127.0.0.1` whose name ends in `_test` and differs from `database`. Import the
+sample SQL into that empty schema and use an account restricted to that schema.
+In a dedicated shell, start a test-mode server on a free port and wait for PHP
+to report that it is listening before running the suite:
+
+```sh
+export HOMELAB_API_TEST_RUN="$(openssl rand -hex 16)"
+php -S 127.0.0.1:18081 -t backend/public backend/public/index.php &
+api_test_pid=$!
+trap 'kill "$api_test_pid" 2>/dev/null || true; unset HOMELAB_API_TEST_RUN' EXIT
+# Wait for PHP to report that it is listening.
+node tests/api.mjs http://127.0.0.1:18081
+```
+
+The server verifies its test database connection and the runner verifies the
+per-run header and sample users before sending writes. The suite removes its
+temporary records. Exit the dedicated shell to stop the test server.
+`php tests/github-release.php` checks GitHub response states with fixtures.
 
 ## Structure
 - Backend: `routes`, `services`, `dao`, `middleware`, `config`, `logs`.

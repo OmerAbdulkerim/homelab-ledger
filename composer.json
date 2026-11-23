@@ -1,0 +1,25 @@
+{
+    "name": "omerabdulkerim/homelab-ledger",
+    "type": "project",
+    "require": {
+        "php": "^8.1",
+        "php-64bit": "^8.1",
+        "ext-ctype": "*",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "ext-pdo_mysql": "*",
+        "flightphp/core": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "HomelabLedger\\Config\\": "backend/config/",
+            "HomelabLedger\\Dao\\": "backend/dao/",
+            "HomelabLedger\\Service\\": "backend/services/"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "8.1.0"
+        }
+    }
+}
